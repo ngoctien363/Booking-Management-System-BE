@@ -17,7 +17,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 /**
- * JWTServiceImpl
+ * This is the implementation of the JWT service interface
  *
  * @author Tuan Le / DG4 Team<br>
  * Created on 11/29/2023

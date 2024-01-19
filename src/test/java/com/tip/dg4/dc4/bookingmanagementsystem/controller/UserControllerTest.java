@@ -15,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserUpdateRequestDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.UserUpdateDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -35,7 +35,7 @@ public class UserControllerTest {
 
 	@Test
 	@WithMockUser(authorities = "USER")
-	public void givenGetUserByIdURI_whenMockMVC_thenVerifyResponse() throws Exception {
+	public void getUserById_whenValid_thenResponseOk() throws Exception {
 		mockMvc.perform(get("/user/{id}", "6299ac61-a11e-471f-951b-2bff3669d492").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.data.email").value("tuanql90@gmail.com"))
@@ -49,13 +49,43 @@ public class UserControllerTest {
 
 	@Test
 	@WithMockUser(authorities = "USER")
-	public void givenUpdateUserURI_whenMockMVC_thenVerifyResponse() throws Exception {
-		UserUpdateRequestDto userUpdateRequestDto = UserUpdateRequestDto.builder()
+	public void getUserById_whenInvalidId_thenResponseNotFound() throws Exception {
+		mockMvc.perform(get("/user/{id}", "6399ac61-a11e-471f-951b-2bff3669d492").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("This user does not exist!"));
+	}
+
+	@Test
+	@WithMockUser(authorities = "USER")
+	public void updateUser_whenValid_thenResponseOk() throws Exception {
+		UserUpdateDto userUpdateDto = UserUpdateDto.builder()
 				.name("TUAN")
 				.build();
-		mockMvc.perform(put("/user/{id}","f8b63a43-e3dd-41ae-8253-e764aba1610c").content(new ObjectMapper().writeValueAsString(userUpdateRequestDto)).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(put("/user/{id}","f8b63a43-e3dd-41ae-8253-e764aba1610c").content(new ObjectMapper().writeValueAsString(userUpdateDto)).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.data.name").value("TUAN"))
 				.andExpect(jsonPath("$.message").value("User was updated successfully!"));
+	}
+
+	@Test
+	@WithMockUser(authorities = "USER")
+	public void updateUser_whenInvalidId_thenResponseNotFound() throws Exception {
+		UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+				.phone("1236666666")
+				.build();
+		mockMvc.perform(put("/user/{id}", "8ccb3cc4-1174-41dd-96cf-97a2e06ba6fe").content(new ObjectMapper().writeValueAsString(userUpdateDto)).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("This user does not exist!"));
+	}
+
+	@Test
+	@WithMockUser(authorities = "USER")
+	public void updateUser_whenInvalidPhoneNumber_thenResponseBadRequest() throws Exception {
+		UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+				.phone("123")
+				.build();
+		mockMvc.perform(put("/user/{id}","f8b63a43-e3dd-41ae-8253-e764aba1610c").content(new ObjectMapper().writeValueAsString(userUpdateDto)).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Phone number has 10 numbers!"));
 	}
 }

@@ -36,7 +36,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<RoomDto> createRooms(UUID hotelId, List<RoomDto> roomDTOs) {
         Hotel hotel = hotelService.findById(hotelId)
-                .orElseThrow(() -> new NotFoundException(ExceptionConstant.HOTEL_E002));
+                .orElseThrow(() -> new NotFoundException(ExceptionConstant.HOTEL_E002 + hotelId));
         if (CollectionUtils.isEmpty(roomDTOs)) return Collections.emptyList();
         List<RoomDto> rooms = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<RoomDto> getRoomsByHotelId(UUID hotelId) {
         if (!hotelService.existsById(hotelId)) {
-            throw new NotFoundException(ExceptionConstant.HOTEL_E002);
+            throw new NotFoundException(ExceptionConstant.HOTEL_E002 + hotelId);
         }
         List<Room> rooms = roomRepository.findByHotelId(hotelId);
         if (CollectionUtils.isEmpty(rooms)) return Collections.emptyList();

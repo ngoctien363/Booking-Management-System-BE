@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_DATABASE: db_bms
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+
+  web:
+    image: booking-management-app
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: 123123
+      DB_NAME: db_bms

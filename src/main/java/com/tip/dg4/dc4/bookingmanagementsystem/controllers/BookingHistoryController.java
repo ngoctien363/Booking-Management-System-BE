@@ -43,7 +43,7 @@ public class BookingHistoryController {
     }
 
     @GetMapping("/{userId}/{status}")
-    public ResponseEntity<DataResponse> getByUserId(@PathVariable UUID userId, @PathVariable(required = false) BookingStatus status) {
+    public ResponseEntity<DataResponse> getByUserIdAndStatus(@PathVariable UUID userId, @PathVariable(required = false) BookingStatus status) {
         HttpStatus httpStatus = HttpStatus.OK;
         DataResponse result = new DataResponse(
                 httpStatus.getReasonPhrase(),

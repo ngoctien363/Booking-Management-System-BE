@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BookingDetailService {
-    void create(BookingHistory bookingHistory, Hotel hotel, BookingRoomDto bookingRoomDto);
+    List<BookingDetail> create(BookingHistory bookingHistory, Hotel hotel, BookingRoomDto bookingRoomDto);
 
     List<BookingDetailDto> getByBookingHistoryId(UUID bookingHistoryId);
 }

@@ -1,6 +1,5 @@
 package com.tip.dg4.dc4.bookingmanagementsystem.controllers;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -20,22 +19,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.SignUpRequestDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserResponseDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserSearchRequestDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserUpdateRequestDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.SignUpDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.UserDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.UserUpdateDto;
 import com.tip.dg4.dc4.bookingmanagementsystem.exceptions.BadRequestException;
 import com.tip.dg4.dc4.bookingmanagementsystem.services.AuthenticationService;
 import com.tip.dg4.dc4.bookingmanagementsystem.services.UserService;
 import com.tip.dg4.dc4.bookingmanagementsystem.shared.constants.AppConstant;
 import com.tip.dg4.dc4.bookingmanagementsystem.shared.constants.ExceptionConstant;
 import com.tip.dg4.dc4.bookingmanagementsystem.shared.res.DataResponse;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * AdminController
+ * The controller for the admin role
  *
  * @author Tuan Le / DG4 Team<br>
  * Created on 11/30/2023
@@ -65,7 +62,7 @@ public class AdminController {
 	public ResponseEntity<DataResponse> searchUser(@RequestParam(value = "keyword", required = false) String searchingValue,
 			@RequestParam(defaultValue = AppConstant.PAGE_INDEX_DEFAULT) int page,
 			@RequestParam(defaultValue = AppConstant.PAGE_SIZE_DEFAULT) int size){
-		Page<UserResponseDto> userResponses;
+		Page<UserDto> userResponses;
 		try {
 			Pageable pageable = PageRequest.of(page-1, size, Sort.by("name").and(Sort.by("surname")));
 			if(null==searchingValue){
@@ -85,21 +82,21 @@ public class AdminController {
 	}
 
 	@PostMapping()
-	public ResponseEntity<DataResponse> createUser(@Valid @RequestBody SignUpRequestDto signUpRequestDto){
+	public ResponseEntity<DataResponse> createUser(@Valid @RequestBody SignUpDto signUpDto){
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
 				"User was created successfully!",
-				authenticationService.signUp(signUpRequestDto)
+				authenticationService.signUp(signUpDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<DataResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto){
+	public ResponseEntity<DataResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateDto userUpdateDto){
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
 				"User was updated successfully!",
-				userService.update(id, userUpdateRequestDto)
+				userService.update(id, userUpdateDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}

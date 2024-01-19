@@ -1,6 +1,11 @@
 package com.tip.dg4.dc4.bookingmanagementsystem.controllers;
 
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.*;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.RefreshTokenDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.SignInDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.SignUpDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.ChangePasswordDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.ForgotPasswordDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.ResetPasswordDto;
 import com.tip.dg4.dc4.bookingmanagementsystem.services.AuthenticationService;
 import com.tip.dg4.dc4.bookingmanagementsystem.shared.constants.AppConstant;
 import com.tip.dg4.dc4.bookingmanagementsystem.shared.res.DataResponse;
@@ -15,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 /**
- * AuthenticationController
+ * The controller for the authentication
  *
  * @author Tuan Le / DG4 Team<br>
  * Created on 11/30/2023
@@ -31,48 +36,48 @@ public class AuthenticationController {
 	DataResponse dataResponse;
 
 	@PostMapping("/signup")
-	public ResponseEntity<DataResponse> signUp(@Valid @RequestBody SignUpRequestDto signUpRequestDto){
+	public ResponseEntity<DataResponse> signUp(@Valid @RequestBody SignUpDto signUpDto){
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
-				"User was created successfully",
-				authenticationService.signUp(signUpRequestDto)
+				"User was created successfully!",
+				authenticationService.signUp(signUpDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}
 
 	@PostMapping("/signin")
-	public ResponseEntity<DataResponse> signIn(@RequestBody SignInRequestDto signInRequestDto){
+	public ResponseEntity<DataResponse> signIn(@Valid @RequestBody SignInDto signInDto){
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
-				"Sign in successfully",
-				authenticationService.signIn(signInRequestDto)
+				"Sign in successfully!",
+				authenticationService.signIn(signInDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}
 
 	@PostMapping("/refresh")
-	public ResponseEntity<DataResponse> refresh(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto){
+	public ResponseEntity<DataResponse> refresh(@RequestBody RefreshTokenDto refreshTokenDto){
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
-				"Token was refreshed successfully",
-				authenticationService.refresh(refreshTokenRequestDto)
+				"Token was refreshed successfully!",
+				authenticationService.refresh(refreshTokenDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}
 
 	@PutMapping("/{userId}/password")
-	public ResponseEntity<DataResponse> changePassword(@PathVariable UUID userId, @RequestBody ChangePasswordRequestDto changePasswordRequestDto){
+	public ResponseEntity<DataResponse> changePassword(@PathVariable UUID userId,@Valid @RequestBody ChangePasswordDto changePasswordDto){
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
-				"Password was changed successfully",
-				authenticationService.changePassword(userId, changePasswordRequestDto)
+				"Password was changed successfully!",
+				authenticationService.changePassword(userId, changePasswordDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}
 
 	@PostMapping("/sendMail")
-	public ResponseEntity<DataResponse> sendMail(@RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto) throws MessagingException {
-		authenticationService.generateOtp(forgotPasswordRequestDto.getEmail());
+	public ResponseEntity<DataResponse> sendMail(@RequestBody ForgotPasswordDto forgotPasswordDto) throws MessagingException {
+		authenticationService.generateOtp(forgotPasswordDto.getEmail());
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
 				AppConstant.MAIL_NOTICE
@@ -81,11 +86,11 @@ public class AuthenticationController {
 	}
 
 	@PutMapping("/verifyAccount")
-	public ResponseEntity<DataResponse> verifyAccount(@RequestBody ResetPasswordRequestDto resetPasswordRequestDto){
+	public ResponseEntity<DataResponse> verifyAccount(@RequestBody ResetPasswordDto resetPasswordDto){
 		dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
-				"Password was reset successfully",
-				authenticationService.resetPassword(resetPasswordRequestDto)
+				"Password was reset successfully!",
+				authenticationService.resetPassword(resetPasswordDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}

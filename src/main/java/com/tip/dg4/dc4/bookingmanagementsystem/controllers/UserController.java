@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserUpdateRequestDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.UserUpdateDto;
 import com.tip.dg4.dc4.bookingmanagementsystem.services.UserService;
 import com.tip.dg4.dc4.bookingmanagementsystem.shared.res.DataResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * UserController
+ * The controller for the User role
  *
  * @author Tuan Le / DG4 Team<br>
  * Created on 11/30/2023
@@ -36,11 +36,11 @@ public class UserController {
 	DataResponse dataResponse;
 
 	@PutMapping("/{id}")
-	public ResponseEntity<DataResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+	public ResponseEntity<DataResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
 		 dataResponse = new DataResponse(
 				httpStatus.getReasonPhrase(),
 				"User was updated successfully!",
-				userService.update(id, userUpdateRequestDto)
+				userService.update(id, userUpdateDto)
 		);
 		return new ResponseEntity<>(dataResponse, httpStatus);
 	}

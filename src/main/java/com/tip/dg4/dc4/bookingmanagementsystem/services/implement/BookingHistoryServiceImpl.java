@@ -35,6 +35,7 @@ public class BookingHistoryServiceImpl implements BookingHistoryService {
     private final BookingDetailService bookingDetailService;
     private final RoomStatusService roomStatusService;
     private final ImageService imageService;
+    private final EmailService emailService;
     private final BookingHistoryMapper bookingHistoryMapper;
 
     @Transactional
@@ -57,6 +58,7 @@ public class BookingHistoryServiceImpl implements BookingHistoryService {
             }
             totalPrice += roomType.getPriceOneNight().intValue() * room.getValue();
         }
+        bookingRoomDto.setCheckOutDate(bookingRoomDto.getCheckOutDate().minusDays(1));
         BookingHistory bookingHistory = BookingHistory.builder()
                 .checkInDate(bookingRoomDto.getCheckInDate())
                 .checkOutDate(bookingRoomDto.getCheckOutDate())
@@ -68,7 +70,8 @@ public class BookingHistoryServiceImpl implements BookingHistoryService {
                 .hotel(hotel).build();
 
         bookingHistoryRepository.save(bookingHistory);
-        bookingDetailService.create(bookingHistory, hotel, bookingRoomDto);
+        bookingHistory.setBookingDetails(bookingDetailService.create(bookingHistory, hotel, bookingRoomDto));
+        emailService.confirmBookingRoom(bookingHistoryMapper.convertEntityToDto(bookingHistory));
     }
 
     @Override

@@ -49,7 +49,7 @@ public class ExceptionConfig{
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ExceptionResponse> handleAuthenticationException(AuthenticationException ex) {
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
         ExceptionResponse exceptionResponse = new ExceptionResponse(
             LocalDateTime.now(),
             httpStatus.getReasonPhrase(),

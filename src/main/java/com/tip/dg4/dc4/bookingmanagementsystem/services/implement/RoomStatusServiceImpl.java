@@ -4,7 +4,6 @@ import com.tip.dg4.dc4.bookingmanagementsystem.dto.booking.BookingRoomDto;
 import com.tip.dg4.dc4.bookingmanagementsystem.models.Room;
 import com.tip.dg4.dc4.bookingmanagementsystem.models.RoomStatus;
 import com.tip.dg4.dc4.bookingmanagementsystem.repositories.RoomStatusRepository;
-import com.tip.dg4.dc4.bookingmanagementsystem.services.RoomService;
 import com.tip.dg4.dc4.bookingmanagementsystem.services.RoomStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
@@ -17,8 +16,6 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class RoomStatusServiceImpl implements RoomStatusService {
     private final RoomStatusRepository roomStatusRepository;
-    @Lazy
-    private final RoomService roomService;
 
     @Override
     public boolean existsByRoomId(UUID roomId) {

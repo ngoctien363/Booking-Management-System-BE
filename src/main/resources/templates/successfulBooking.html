@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta  http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Xác nhận đặt phòng thành công</title>
+</head>
+<body>
+<div>
+    <img style="max-height: 400px;"
+         src="https://res.cloudinary.com/dax8xvyhi/image/upload/v1701854719/uzorem6s7cybuo9yewiu.jpg" alt="">
+    <div>
+        <h3>Kính gửi <span style="font-weight: 700;" th:text="${customerName}">Tên</span>,</h3>
+        <div>
+            <h2 style="margin: 0;font-weight: 400;font-size: 16px;" >
+                Cảm ơn bạn đã chọn ở lại với chúng tôi tại
+                <span style=" font-weight: 700;font-size: 20px;color: red;" th:text="${hotelName}">Tên Hotel</span>
+            </h2>
+            <div style="display: flex;align-items: center;">
+                <p style="font-weight: 400;font-size: 15px;color: black;">Chúng tôi rất vui khi chào đón bạn từ
+                    <span style="color: blue;font-weight: 700;" th:text="${checkInDate}">Ngày checkin</span> Đến
+                    <span style="color: blue;font-weight: 700;" th:text="${checkOutDate}">Ngày checkout</span>
+                </p>
+            </div>
+            <div>
+                <p style="margin: 0 0 10px 0;">Chi tiết đặt phòng: </p>
+                <table>
+                    <thead>
+                    <tr style="background-color: #4d4d4d;color: white;">
+                        <th style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px;">
+                            Tên Phòng
+                        </th>
+                        <th style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px;">
+                            Loại Phòng
+                        </th>
+                        <th style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px;">
+                            Ngày ở
+                        </th>
+                        <th style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px; ">
+                            Giá Phòng
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="background-color: #d9e8e9;" th:each="prod: ${detail}">
+                        <td style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px;" th:text="${prod.roomNumber}">
+                            Tên phòng
+                        </td>
+                        <td style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px;" th:text="${prod.roomType}">
+                            Loại phòng
+                        </td>
+                        <td style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px;" th:text="${duration}">
+                            Ngày ở
+                        </td>
+                        <td style="min-width: 75px;text-decoration: none; list-style: none; padding: 8px 30px;">
+                            $ <span th:text="${prod.price}">Giá phòng</span> / Đêm
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p style="margin: 10px 0 10px 0;">Vui lòng thanh toán tại quầy với số
+                    tiền: $ <span style="padding-left: 2px;font-weight: 600" th:text="${totalPrice}">Tổng tiền</span>
+                </p>
+                <p style="margin: 10px 0 10px 0;">
+                    Nếu bạn yêu cầu bất kỳ tiện nghi hoặc dịch vụ bổ sung
+                    nào, chúng tôi sẽ sẵn lòng cung cấp những tiện nghi hoặc dịch vụ đó cho bạn trong thời gian
+                    lưu trú.
+                </p>
+                <p style="margin: 10px 0 10px 0;"> Cảm ơn bạn một lần nữa vì đã chọn chúng tôi và chúng tôi
+                    mong được có bạn là khách của chúng tôi.</p>
+                <p style="margin: 10px 0 10px 0;"> Trân trọng,</p>
+                <p style="font-weight: 600" th:text="${hotelName}">Tên Hotel</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -9,18 +9,18 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.ChangePasswordRequestDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.JWTAuthenticationResponseDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.ChangePasswordDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.JWTAuthenticationDto;
 import com.tip.dg4.dc4.bookingmanagementsystem.dto.OtpResponseDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.RefreshTokenRequestDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.ResetPasswordRequestDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.SignInRequestDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.SignUpRequestDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserResponseDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.RefreshTokenDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.ResetPasswordDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.SignInDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.auth.SignUpDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.UserDto;
 import com.tip.dg4.dc4.bookingmanagementsystem.exceptions.BadRequestException;
 import com.tip.dg4.dc4.bookingmanagementsystem.exceptions.NotFoundException;
+import com.tip.dg4.dc4.bookingmanagementsystem.exceptions.UnauthorizedException;
 import com.tip.dg4.dc4.bookingmanagementsystem.mappers.UserMapper;
 import com.tip.dg4.dc4.bookingmanagementsystem.models.User;
 import com.tip.dg4.dc4.bookingmanagementsystem.models.enums.UserRole;
@@ -53,13 +53,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final JWTService jwtService;
 	private final OtpUtil otpUtil;
 	private final EmailService emailService;
-	private final HandlerExceptionResolver handlerExceptionResolver;
 	private OtpResponseDto otpResponseDto;
 	@Override
-	public UserResponseDto signUp(SignUpRequestDto signUpRequestDto) {
-		if (!userService.isExistingEmail(signUpRequestDto.getEmail())){
-			User user = modelMapper.map(signUpRequestDto, User.class);
-			user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
+	public UserDto signUp(SignUpDto signUpDto) {
+		if (!userService.isExistingEmail(signUpDto.getEmail())){
+			User user = modelMapper.map(signUpDto, User.class);
+			user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 			user.setRole(UserRole.USER);
 			return userService.save(user);
 		} else {
@@ -68,32 +67,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public JWTAuthenticationResponseDto signIn(SignInRequestDto signInRequestDto) {
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequestDto.getEmail(),
-				signInRequestDto.getPassword()));
-		User user = userService.retrieveByEmail(signInRequestDto.getEmail());
+	public JWTAuthenticationDto signIn(SignInDto signInDto) {
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInDto.getEmail(),
+				signInDto.getPassword()));
+		User user = userService.retrieveByEmail(signInDto.getEmail());
 		return createAuthenticationObject(user);
 	}
 
 	@Override
-	public JWTAuthenticationResponseDto changePassword(UUID id, ChangePasswordRequestDto changePasswordRequestDto) {
+	public JWTAuthenticationDto changePassword(UUID id, ChangePasswordDto changePasswordDto) {
 		User user = modelMapper.map(userService.retrieveById(id), User.class);
-		if(passwordEncoder.matches(changePasswordRequestDto.getOldPassword(), user.getPassword())){
-			user.setPassword(passwordEncoder.encode(changePasswordRequestDto.getNewPassword()));
+		if(passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())){
+			user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
 			userService.save(user);
 			return createAuthenticationObject(user);
 		} else {
-			throw new NotFoundException(ExceptionConstant.USER_E003);
+			throw new UnauthorizedException(ExceptionConstant.USER_E003);
 		}
 	}
 
 	@Override
-	public UserResponseDto resetPassword(ResetPasswordRequestDto resetPasswordRequestDto) {
-		if(resetPasswordRequestDto.getOtp().equals(otpResponseDto.getOtp())){
+	public UserDto resetPassword(ResetPasswordDto resetPasswordDto) {
+		if(resetPasswordDto.getOtp().equals(otpResponseDto.getOtp())){
 			if(Duration.between(otpResponseDto.getOtpGeneratedTime(),
 					LocalDateTime.now()).getSeconds() < AppConstant.OTP_EXPIRATION_TIME){
-				User user = userService.retrieveByEmail(resetPasswordRequestDto.getEmail());
-				user.setPassword(passwordEncoder.encode(resetPasswordRequestDto.getNewPassword()));
+				User user = userService.retrieveByEmail(resetPasswordDto.getEmail());
+				user.setPassword(passwordEncoder.encode(resetPasswordDto.getNewPassword()));
 				return userService.save(user);
 			} else {
 				throw new BadRequestException(ExceptionConstant.USER_E008);
@@ -104,27 +103,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public JWTAuthenticationResponseDto refresh(RefreshTokenRequestDto refreshTokenRequestDto) {
-		String userEmail = jwtService.extractUserName(refreshTokenRequestDto.getToken());
+	public JWTAuthenticationDto refresh(RefreshTokenDto refreshTokenDto) {
+		String userEmail = jwtService.extractUserName(refreshTokenDto.getToken());
 		User user = userService.retrieveByEmail(userEmail);
-		if(jwtService.isTokenValid(refreshTokenRequestDto.getToken(), user)){
+		if(jwtService.isTokenValid(refreshTokenDto.getToken(), user)){
 			String jwt = jwtService.generateToken(user);
-			JWTAuthenticationResponseDto jwtAuthenticationResponseDto = userMapper.convertUserToJWTAuthenticationResponse(user);
-			jwtAuthenticationResponseDto.setToken(jwt);
-			jwtAuthenticationResponseDto.setRefreshToken(refreshTokenRequestDto.getToken());
-			return jwtAuthenticationResponseDto;
+			JWTAuthenticationDto jwtAuthenticationDto = userMapper.convertUserToJWTAuthenticationResponse(user);
+			jwtAuthenticationDto.setToken(jwt);
+			jwtAuthenticationDto.setRefreshToken(refreshTokenDto.getToken());
+			return jwtAuthenticationDto;
 		}
 		return null;
 	}
 
 	@Override
-	public JWTAuthenticationResponseDto createAuthenticationObject(User user) {
+	public JWTAuthenticationDto createAuthenticationObject(User user) {
 		String jwt = jwtService.generateToken(user);
 		String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
-		JWTAuthenticationResponseDto jwtAuthenticationResponseDto = userMapper.convertUserToJWTAuthenticationResponse(user);
-		jwtAuthenticationResponseDto.setToken(jwt);
-		jwtAuthenticationResponseDto.setRefreshToken(refreshToken);
-		return jwtAuthenticationResponseDto;
+		JWTAuthenticationDto jwtAuthenticationDto = userMapper.convertUserToJWTAuthenticationResponse(user);
+		jwtAuthenticationDto.setToken(jwt);
+		jwtAuthenticationDto.setRefreshToken(refreshToken);
+		return jwtAuthenticationDto;
 	}
 
 	@Override

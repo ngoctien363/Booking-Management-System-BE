@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,7 +33,8 @@ public class BookingDetailServiceImpl implements BookingDetailService {
     private final BookingDetailMapper bookingDetailMapper;
 
     @Override
-    public void create(BookingHistory bookingHistory, Hotel hotel, BookingRoomDto bookingRoomDto) {
+    public List<BookingDetail> create(BookingHistory bookingHistory, Hotel hotel, BookingRoomDto bookingRoomDto) {
+        List<BookingDetail> bookingDetails = new ArrayList<>();
         for (Map.Entry<String, Integer> room : bookingRoomDto.getRooms().entrySet()) {
             RoomType roomType = RoomType.getType(room.getKey());
             for (int i = 0; i < room.getValue(); i++) {
@@ -50,9 +52,11 @@ public class BookingDetailServiceImpl implements BookingDetailService {
                         .roomStatus(roomStatus)
                         .bookingHistory(bookingHistory).build();
 
-                bookingDetailRepository.save(bookingDetail);
+                bookingDetails.add(bookingDetailRepository.save(bookingDetail));
             }
         }
+
+        return bookingDetails;
     }
 
     @Override

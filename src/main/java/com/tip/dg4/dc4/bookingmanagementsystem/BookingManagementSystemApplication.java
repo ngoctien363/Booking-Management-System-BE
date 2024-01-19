@@ -20,8 +20,7 @@ public class BookingManagementSystemApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		User adminAccount = userService.retrieveByRole(UserRole.ADMIN);
-		if(adminAccount==null){
+		if(!userService.isExistingRole(UserRole.ADMIN)){
 			User user = User.builder()
 					.email("admin@gmail.com")
 					.name("Admin")

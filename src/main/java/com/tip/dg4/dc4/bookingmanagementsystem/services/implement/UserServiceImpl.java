@@ -1,7 +1,7 @@
 package com.tip.dg4.dc4.bookingmanagementsystem.services.implement;
 
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserResponseDto;
-import com.tip.dg4.dc4.bookingmanagementsystem.dto.UserUpdateRequestDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.UserDto;
+import com.tip.dg4.dc4.bookingmanagementsystem.dto.user.UserUpdateDto;
 import com.tip.dg4.dc4.bookingmanagementsystem.exceptions.NotFoundException;
 import com.tip.dg4.dc4.bookingmanagementsystem.mappers.UserMapper;
 import com.tip.dg4.dc4.bookingmanagementsystem.models.User;
@@ -12,17 +12,19 @@ import com.tip.dg4.dc4.bookingmanagementsystem.shared.constants.ExceptionConstan
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
- * UserServiceImpl
+ * This is the implementation of User service interface
  *
  * @author Tuan Le / DG4 Team<br>
  * Created on 11/29/2023
@@ -46,13 +48,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Page<UserResponseDto> searchUser(String keyword, Pageable pageable) {
+	public Page<UserDto> searchUser(String keyword, Pageable pageable) {
 		return userMapper.convertPageUserToPageUserResponse(userRepository.findAllUserByNameOrSurnameOrEmail(keyword, pageable));
 	}
 
 	@Override
-	public User retrieveByRole(UserRole role) {
-		return userRepository.findByRole(role);
+	public boolean isExistingRole(UserRole role) {
+		return userRepository.existsByRole(role);
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserResponseDto retrieveById(UUID id) {
+	public UserDto retrieveById(UUID id) {
 		User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException(ExceptionConstant.USER_E001));
 		return userMapper.convertUserToUserResponse(user);
 	}
@@ -76,21 +78,23 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Page<UserResponseDto> retrieveAll(Pageable pageable) {
-		Page<User> users = userRepository.findAll(pageable);
-		return userMapper.convertPageUserToPageUserResponse(users);
+	public Page<UserDto> retrieveAll(Pageable pageable) {
+		List<User> users = userRepository.findAll(pageable).stream()
+				.filter(user -> user.getRole().equals(UserRole.USER)).toList();
+
+		return userMapper.convertPageUserToPageUserResponse(new PageImpl<>(users));
 	}
 
 	@Override
-	public UserResponseDto save(User user) {
+	public UserDto save(User user) {
 			User newUser = userRepository.save(user);
 			return userMapper.convertUserToUserResponse(newUser);
 	}
 
 	@Override
-	public UserResponseDto update(UUID id, UserUpdateRequestDto userUpdateRequestDto) {
+	public UserDto update(UUID id, UserUpdateDto userUpdateDto) {
 		User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException(ExceptionConstant.USER_E001));
-		modelMapper.map(userUpdateRequestDto, user);
+		modelMapper.map(userUpdateDto, user);
 		return userMapper.convertUserToUserResponse(userRepository.save(user));
 	}
 
